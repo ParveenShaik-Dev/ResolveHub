@@ -6,22 +6,82 @@ trigger:
 pool:
   name: Default
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.x'
+stages:
+- stage: Backend
+  displayName: 'Build Backend'
+  jobs:
+  - job: BuildAPI
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'
+    - script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
+      displayName: 'Restore packages'
+    - script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
+      displayName: 'Build ASP.NET Core API'
+    - script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)/backend
+      displayName: 'Publish ASP.NET Core API'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend'
+        ArtifactName: 'backend-drop'
 
-- script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
-  displayName: 'Restore packages'
+- stage: DeployBackend
+  displayName: 'Deploy Backend'
+  dependsOn: Backend
+  jobs:
+  - job: Deploy
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'backend-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appType: 'webApp'
+        appName: 'Resolvehub-api'
+        package: '$(System.ArtifactsDirectory)/backend-drop'
 
-- script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
-  displayName: 'Build ASP.NET Core API'
+- stage: Frontend
+  displayName: 'Build Frontend'
+  dependsOn: DeployBackend
+  jobs:
+  - job: BuildAngular
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js'
+    - script: npm install
+      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+      displayName: 'Install packages'
+    - script: npm run build -- --configuration production
+      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+      displayName: 'Build Angular App'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
+        ArtifactName: 'frontend-drop'
 
-- script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)
-  displayName: 'Publish ASP.NET Core API'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'backend-drop'
+- stage: DeployFrontend
+  displayName: 'Deploy Frontend'
+  dependsOn: Frontend
+  jobs:
+  - job: Deploy
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'frontend-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appType: 'webApp'
+        appName: 'resolvehub-angular'
+        package: '$(System.ArtifactsDirectory)/frontend-drop'
