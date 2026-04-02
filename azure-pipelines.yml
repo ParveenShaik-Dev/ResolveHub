@@ -6,22 +6,48 @@ trigger:
 pool:
   name: Default
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '8.x'
+stages:
+- stage: Backend
+  displayName: 'Build Backend'
+  jobs:
+  - job: BuildAPI
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.x'
 
-- script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
-  displayName: 'Restore packages'
+    - script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
+      displayName: 'Restore packages'
 
-- script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
-  displayName: 'Build ASP.NET Core API'
+    - script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
+      displayName: 'Build ASP.NET Core API'
 
-- script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)
-  displayName: 'Publish ASP.NET Core API'
+    - script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)/backend
+      displayName: 'Publish ASP.NET Core API'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'backend-drop'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend'
+        ArtifactName: 'backend-drop'
+
+- stage: Frontend
+  displayName: 'Build Frontend'
+  jobs:
+  - job: BuildAngular
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        cd $(Build.SourcesDirectory)/SupportTicket.Angular
+        npm install
+        npm run build -- --configuration production
+      displayName: 'Build Angular App'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
+        ArtifactName: 'frontend-drop'
