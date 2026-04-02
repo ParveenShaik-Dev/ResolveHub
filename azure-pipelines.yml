@@ -27,8 +27,28 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend'
         ArtifactName: 'backend-drop'
 
+- stage: DeployBackend
+  displayName: 'Deploy Backend'
+  dependsOn: Backend
+  jobs:
+  - job: Deploy
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'backend-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appType: 'webApp'
+        appName: 'Resolvehub-api'
+        package: '$(System.ArtifactsDirectory)/backend-drop'
+
 - stage: Frontend
   displayName: 'Build Frontend'
+  dependsOn: DeployBackend
   jobs:
   - job: BuildAngular
     steps:
@@ -39,15 +59,9 @@ stages:
     - script: npm install
       workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
       displayName: 'Install packages'
-
     - script: npm run build -- --configuration production
       workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
       displayName: 'Build Angular App'
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
-        ArtifactName: 'frontend-drop'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
