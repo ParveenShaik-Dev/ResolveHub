@@ -66,3 +66,22 @@ stages:
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
         ArtifactName: 'frontend-drop'
+
+- stage: DeployFrontend
+  displayName: 'Deploy Frontend'
+  dependsOn: Frontend
+  jobs:
+  - job: Deploy
+    steps:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'frontend-drop'
+        downloadPath: '$(System.ArtifactsDirectory)'
+    - task: AzureWebApp@1
+      inputs:
+        azureSubscription: 'AzureServiceConnection'
+        appType: 'webApp'
+        appName: 'resolvehub-angular'
+        package: '$(System.ArtifactsDirectory)/frontend-drop'
