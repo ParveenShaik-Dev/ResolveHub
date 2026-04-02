@@ -48,7 +48,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-  // options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+  
   options.UseSqlite("Data Source=ticketdb.sqlite"));
 
 //  Repositories  add these lines in Program.cs after builder.Services.AddDbContext
