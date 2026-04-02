@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="header">
+    <h2>My Tickets</h2>
+    <div style="display:flex; gap:10px;">
+      <button (click)="router.navigate(['/create-ticket'])">+ New Ticket</button>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <table *ngIf="tickets && tickets.length > 0">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of tickets">
+        <td>{{ t.title }}</td>
+        <td>{{ t.status }}</td>
+        <td>{{ t.priority }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!tickets || tickets.length === 0">No tickets yet.</p>
+</div>

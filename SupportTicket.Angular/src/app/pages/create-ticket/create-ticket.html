@@ -1,0 +1,16 @@
+<div class="container">
+  <h2>Create Ticket</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <input type="text" [(ngModel)]="title" placeholder="Title" />
+  <textarea [(ngModel)]="description" placeholder="Description" rows="4"></textarea>
+  <select [(ngModel)]="priority">
+    <option>Low</option>
+    <option>Medium</option>
+    <option>High</option>
+  </select>
+  <button (click)="submit()" [disabled]="isLoading" [class.btn-loading]="isLoading">
+  <span *ngIf="isLoading" class="spinner"></span>
+  {{ isLoading ? 'Submitting...' : 'Submit' }}
+   </button>
+  <a routerLink="/dashboard">← Back to Dashboard</a>
+</div>

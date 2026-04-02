@@ -1,0 +1,91 @@
+<div class="container" style="max-width:900px;">
+  <div class="header">
+    <h2>🎧 Agent Dashboard</h2>
+    <button (click)="logout()">Logout</button>
+  </div>
+
+  <div *ngIf="message" class="success">{{ message }}</div>
+
+  <!-- Tabs -->
+  <div style="display:flex; gap:10px; margin-bottom:16px;">
+    <button 
+      (click)="activeTab='all'"
+      [style.opacity]="activeTab==='all' ? '1' : '0.5'">
+      All Tickets ({{ allTickets.length }})
+    </button>
+    <button 
+      (click)="activeTab='mine'"
+      [style.opacity]="activeTab==='mine' ? '1' : '0.5'">
+      My Assigned ({{ myTickets.length }})
+    </button>
+  </div>
+
+  <!-- All Tickets Tab -->
+  <table *ngIf="activeTab==='all' && allTickets.length > 0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Customer</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Update Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of allTickets" 
+          (click)="router.navigate(['/ticket', t.id])" 
+          style="cursor:pointer;">
+        <td>{{ t.id }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.createdByUsername }}</td>
+        <td>{{ t.priority }}</td>
+        <td>{{ t.status }}</td>
+        <td (click)="$event.stopPropagation()">
+          <select [value]="t.status" (change)="updateStatus(t, $any($event.target).value)">
+            <option>Open</option>
+            <option>InProgress</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- My Assigned Tab -->
+  <table *ngIf="activeTab==='mine' && myTickets.length > 0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Customer</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Update Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of myTickets"
+          (click)="router.navigate(['/ticket', t.id])"
+          style="cursor:pointer;">
+        <td>{{ t.id }}</td>
+        <td>{{ t.title }}</td>
+        <td>{{ t.createdByUsername }}</td>
+        <td>{{ t.priority }}</td>
+        <td>{{ t.status }}</td>
+        <td (click)="$event.stopPropagation()">
+          <select [value]="t.status" (change)="updateStatus(t, $any($event.target).value)">
+            <option>Open</option>
+            <option>InProgress</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="activeTab==='all' && allTickets.length === 0">No tickets found.</p>
+  <p *ngIf="activeTab==='mine' && myTickets.length === 0">No assigned tickets yet.</p>
+</div>

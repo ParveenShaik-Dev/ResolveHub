@@ -1,0 +1,59 @@
+<div class="container" *ngIf="ticket">
+
+  <div class="header">
+    <h2>Ticket #{{ ticket.id }}</h2>
+    <button (click)="goBack()">← Back</button>
+  </div>
+
+  <div *ngIf="message" class="success">{{ message }}</div>
+
+  <!-- VIEW MODE -->
+  <div *ngIf="!isEditing">
+    <p><strong>Title:</strong> {{ ticket.title }}</p>
+    <p><strong>Description:</strong> {{ ticket.description }}</p>
+    <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+    <p><strong>Status:</strong> {{ ticket.status }}</p>
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button (click)="startEdit()">✏️ Edit</button>
+      <button (click)="deleteTicket()" style="background:#ef4444;">🗑️ Delete</button>
+    </div>
+  </div>
+
+  <!-- EDIT MODE -->
+  <div *ngIf="isEditing">
+    <input [(ngModel)]="editTitle" placeholder="Title" />
+    <textarea [(ngModel)]="editDescription" rows="3" placeholder="Description"></textarea>
+    <select [(ngModel)]="editPriority">
+      <option>Low</option>
+      <option>Medium</option>
+      <option>High</option>
+    </select>
+    <div style="display:flex; gap:10px;">
+      <button (click)="saveEdit()">💾 Save</button>
+      <button (click)="isEditing=false" style="background:#6b7280;">Cancel</button>
+    </div>
+  </div>
+
+  <hr style="margin:20px 0; border-color:#eee;">
+
+  <!-- COMMENTS -->
+  <h3>Comments ({{ comments.length }})</h3>
+
+  <div *ngFor="let c of comments" style="padding:10px; border:1px solid #eee; border-radius:8px; margin:8px 0;">
+    <p>{{ c.content }}</p>
+    <button (click)="deleteComment(c.id)" style="background:#ef4444; padding:4px 10px; font-size:0.8rem;">Delete</button>
+  </div>
+
+  <div *ngIf="comments.length === 0" style="color:#888; padding:10px 0;">No comments yet.</div>
+
+  <!-- ADD COMMENT -->
+  <div style="margin-top:16px;">
+    <textarea [(ngModel)]="newComment" rows="2" placeholder="Write a comment..."></textarea>
+    <button (click)="addComment()" style="margin-top:8px;">💬 Add Comment</button>
+  </div>
+
+</div>
+
+<div class="container" *ngIf="!ticket">
+  <p>Loading ticket...</p>
+</div>

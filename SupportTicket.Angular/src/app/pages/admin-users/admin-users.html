@@ -1,0 +1,65 @@
+<div class="container" style="max-width:900px;">
+  <div class="header">
+    <h2>👥 Manage Users</h2>
+    <div style="display:flex; gap:10px;">
+      <button (click)="router.navigate(['/admin/create-agent'])">➕ Create Agent</button>
+      <button (click)="router.navigate(['/admin'])">← Admin Dashboard</button>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div *ngIf="message" class="success">{{ message }}</div>
+
+  <table *ngIf="users.length > 0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of users">
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <span [style.color]="u.role === 'Admin' ? '#7c3aed' : u.role === 'Agent' ? '#0891b2' : '#16a34a'">
+            {{ u.role }}
+          </span>
+        </td>
+        <td>{{ u.createdAt | date:'mediumDate' }}</td>
+        <td>
+          <div style="display:flex; gap:6px;">
+            <button 
+              *ngIf="u.role === 'Agent'"
+              (click)="promote(u.id, u.username)"
+              style="background:#7c3aed; padding:6px 10px; font-size:0.8rem;">
+              ⬆️ Promote
+            </button>
+            <button 
+              *ngIf="u.role !== 'Admin'"
+              (click)="deleteUser(u.id, u.username)"
+              style="background:#ef4444; padding:6px 10px; font-size:0.8rem;">
+              🗑️ Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="users.length === 0">No users found.</p>
+</div>
+```
+
+---
+
+## Summary — what you get
+```
+/admin              → All tickets + status change + delete
+/admin/users        → All users table + promote + delete
+/admin/create-agent → Form to create agent accounts

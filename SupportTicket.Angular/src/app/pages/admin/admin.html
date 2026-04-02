@@ -1,0 +1,62 @@
+<div class="container" style="max-width:1000px;">
+  <div class="header">
+    <h2>🛠️ Admin Dashboard</h2>
+    <div style="display:flex; gap:10px;">
+      <button (click)="router.navigate(['/admin/users'])">👥 Manage Users</button>
+      <button (click)="router.navigate(['/admin/create-agent'])">➕ Create Agent</button>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div *ngIf="message" class="success">{{ message }}</div>
+
+  <table *ngIf="tickets.length > 0">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Customer</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Assign To</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of tickets">
+        <td>{{ t.id }}</td>
+        <td style="cursor:pointer; color:#667eea;" 
+            (click)="router.navigate(['/ticket', t.id])">
+          {{ t.title }}
+        </td>
+        <td>{{ t.createdByUsername }}</td>
+        <td>{{ t.priority }}</td>
+        <td>
+          <select [value]="t.status" 
+                  (change)="updateStatus(t, $any($event.target).value)">
+            <option>Open</option>
+            <option>InProgress</option>
+            <option>Resolved</option>
+            <option>Closed</option>
+          </select>
+        </td>
+        <td>
+          <select (change)="assignTicket(t.id, $any($event.target).value)">
+            <option value="">-- Assign --</option>
+            <option *ngFor="let a of agents" [value]="a.id">
+              {{ a.username }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <button (click)="deleteTicket(t.id)" 
+                  style="background:#ef4444; padding:6px 12px;">
+            🗑️ Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="tickets.length === 0">No tickets found.</p>
+</div>

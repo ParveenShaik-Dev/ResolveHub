@@ -1,0 +1,18 @@
+<div class="container">
+  <div class="header">
+    <h2>➕ Create Agent</h2>
+    <button (click)="router.navigate(['/admin'])">← Back to Admin</button>
+  </div>
+
+  <div *ngIf="message" class="success">{{ message }}</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <input type="text" [(ngModel)]="username" placeholder="Username" />
+  <input type="email" [(ngModel)]="email" placeholder="Email" />
+  <input type="password" [(ngModel)]="password" placeholder="Password" />
+  <button (click)="createAgent()" [disabled]="isLoading" [class.btn-loading]="isLoading">
+  <span *ngIf="isLoading" class="spinner"></span>
+  {{ isLoading ? 'Creating...' : 'Create Agent' }}
+  </button>
+  <a routerLink="/admin">← Back</a>
+</div>

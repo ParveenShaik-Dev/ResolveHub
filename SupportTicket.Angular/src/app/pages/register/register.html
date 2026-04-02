@@ -1,0 +1,12 @@
+<div class="container">
+  <h2>Register</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <input type="text" [(ngModel)]="username" placeholder="Username" />
+  <input type="email" [(ngModel)]="email" placeholder="Email" />
+  <input type="password" [(ngModel)]="password" placeholder="Password" />
+  <button (click)="register()" [disabled]="isLoading" [class.btn-loading]="isLoading">
+  <span *ngIf="isLoading" class="spinner"></span>
+  {{ isLoading ? 'Registering...' : 'Register' }}
+  </button>
+  <a routerLink="/login">Already have an account? Login</a>
+</div>
