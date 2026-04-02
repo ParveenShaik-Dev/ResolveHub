@@ -43,5 +43,5 @@ stages:
       displayName: 'Build Angular App'
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist/ticket-app'
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
         ArtifactName: 'frontend-drop'
