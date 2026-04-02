@@ -36,11 +36,18 @@ stages:
       inputs:
         versionSpec: '20.x'
       displayName: 'Install Node.js'
-    - script: |
-        cd $(Build.SourcesDirectory)/SupportTicket.Angular
-        npm install
-        npm run build -- --configuration production
+    - script: npm install
+      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+      displayName: 'Install packages'
+
+    - script: npm run build -- --configuration production
+      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
       displayName: 'Build Angular App'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
+        ArtifactName: 'frontend-drop'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
