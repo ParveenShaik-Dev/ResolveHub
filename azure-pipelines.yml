@@ -16,16 +16,12 @@ stages:
       inputs:
         packageType: 'sdk'
         version: '8.x'
-
     - script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
       displayName: 'Restore packages'
-
     - script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
       displayName: 'Build ASP.NET Core API'
-
     - script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)/backend
       displayName: 'Publish ASP.NET Core API'
-
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)/backend'
@@ -40,14 +36,12 @@ stages:
       inputs:
         versionSpec: '20.x'
       displayName: 'Install Node.js'
-
     - script: |
         cd $(Build.SourcesDirectory)/SupportTicket.Angular
         npm install
         npm run build -- --configuration production
       displayName: 'Build Angular App'
-
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist/ticket-app'
         ArtifactName: 'frontend-drop'
