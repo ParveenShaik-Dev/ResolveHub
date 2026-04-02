@@ -1,0 +1,27 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: Default
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: dotnet restore "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj"
+  displayName: 'Restore packages'
+
+- script: dotnet build "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release
+  displayName: 'Build ASP.NET Core API'
+
+- script: dotnet publish "$(Build.SourcesDirectory)/SupportTicket.API/SupportTicket.API.csproj" --configuration Release --output $(Build.ArtifactStagingDirectory)
+  displayName: 'Publish ASP.NET Core API'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'backend-drop'
