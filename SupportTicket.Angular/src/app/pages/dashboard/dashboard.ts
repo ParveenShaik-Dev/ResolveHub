@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,7 +58,7 @@ export class Dashboard {
     if (!token) { this.router.navigate(['/login']); return; }
 
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    this.http.get<any[]>('https://localhost:7005/api/tickets', { headers }).subscribe({
+    this.http.get<any[]>(environment.apiUrl, { headers }).subscribe({
       next: (data) => {
         this.isLoading = false;  // ← stop loader
         this.tickets = [...data];

@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class Login {
 
   login() {
     this.isLoading =true;
-    this.http.post<any>('https://localhost:7005/api/auth/login', {
+    this.http.post<any>(environment.apiUrl;, {
       email: this.email,
       password: this.password
     }).subscribe({

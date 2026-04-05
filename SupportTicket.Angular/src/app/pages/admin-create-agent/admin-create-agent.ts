@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-create-agent',
@@ -16,7 +17,7 @@ export class AdminCreateAgent {
   password = '';
   message = '';
   error = '';
-  private api = 'https://localhost:7005/api';
+  private api = environment.apiUrl;
 
   constructor(private http: HttpClient, public router: Router) {
     // only admin can access

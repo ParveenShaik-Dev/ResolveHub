@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin',
@@ -14,7 +15,7 @@ export class Admin {
   tickets: any[] = [];
   agents: any[] = [];
   message = '';
-  private api = 'https://localhost:7005/api';
+  private api = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
