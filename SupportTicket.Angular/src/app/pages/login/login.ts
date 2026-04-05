@@ -18,7 +18,7 @@ export class Login {
 
   login() {
     this.isLoading =true;
-    this.http.post<any>(environment.apiUrl, {
+    this.http.post<any>(`${environment.apiUrl}/auth/login`, {
       email: this.email,
       password: this.password
     }).subscribe({

@@ -58,8 +58,7 @@ export class Dashboard {
     if (!token) { this.router.navigate(['/login']); return; }
 
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    this.http.get<any[]>(environment.apiUrl, { headers }).subscribe({
-      next: (data) => {
+this.http.get<any[]>(`${environment.apiUrl}/tickets`, { headers }).subscribe({      next: (data) => {
         this.isLoading = false;  // ← stop loader
         this.tickets = [...data];
         this.message = data.length === 0 ? 'No tickets yet.' : '';
