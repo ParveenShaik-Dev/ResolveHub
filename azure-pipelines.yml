@@ -53,7 +53,7 @@ stages:
   jobs:
   - job: BuildAngular
     steps:
-    - task: NodeTool@1
+    - task: NodeTool@0        # ✅ Changed from NodeTool@1 to NodeTool@0
       inputs:
         versionSpec: '20.x'
       displayName: 'Install Node.js'
