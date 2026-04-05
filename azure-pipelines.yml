@@ -48,28 +48,34 @@ stages:
 
 - stage: Frontend
   displayName: 'Build Frontend'
-  dependsOn: DeployBackend
+  dependsOn:
+  - DeployBackend
   jobs:
   - job: BuildAngular
     steps:
-    - task: NodeTool@0
+    - task: NodeTool@1
       inputs:
         versionSpec: '20.x'
       displayName: 'Install Node.js'
-    - script: npm install
-      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+    - task: CmdLine@2
       displayName: 'Install packages'
-    - script: npm run build -- --configuration production
-      workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+      inputs:
+        script: npm install
+        workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
+    - task: CmdLine@2
       displayName: 'Build Angular App'
+      inputs:
+        script: npm run build -- --configuration production
+        workingDirectory: '$(Build.SourcesDirectory)/SupportTicket.Angular'
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist'
+        PathtoPublish: '$(Build.SourcesDirectory)/SupportTicket.Angular/dist/ticket-app/browser'
         ArtifactName: 'frontend-drop'
 
 - stage: DeployFrontend
   displayName: 'Deploy Frontend'
-  dependsOn: Frontend
+  dependsOn:
+  - Frontend
   jobs:
   - job: Deploy
     steps:
@@ -79,6 +85,27 @@ stages:
         downloadType: 'single'
         artifactName: 'frontend-drop'
         downloadPath: '$(System.ArtifactsDirectory)'
+    - task: CmdLine@2
+      displayName: 'Add web.config for Angular routing'
+      inputs:
+        script: |
+          echo ^<?xml version="1.0"?^> > "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<configuration^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<system.webServer^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<rewrite^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<rules^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<rule name="Angular" stopProcessing="true"^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<match url=".*" /^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<conditions logicalGrouping="MatchAll"^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" /^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" /^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</conditions^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^<action type="Rewrite" url="/index.html" /^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</rule^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</rules^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</rewrite^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</system.webServer^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
+          echo ^</configuration^> >> "$(System.ArtifactsDirectory)/frontend-drop/web.config"
     - task: AzureWebApp@1
       inputs:
         azureSubscription: 'AzureServiceConnection'
